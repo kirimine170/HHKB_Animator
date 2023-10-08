@@ -5,6 +5,8 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.2/userguide/building_java_projects.html in the Gradle documentation.
  */
 
+
+
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
@@ -15,6 +17,9 @@ repositories {
     mavenCentral()
 }
 
+project.ext.lwjglVersion = "3.3.3"
+project.ext.lwjglNatives = "natives-macos-arm64"
+
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
@@ -23,11 +28,21 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:31.1-jre'
-    // https://mvnrepository.com/artifact/org.lwjgl/lwjgl
-    implementation 'org.lwjgl:lwjgl:3.3.3'
-    implementation 'org.lwjgl:lwjgl-glfw:3.3.3'
-    implementation 'org.lwjgl:lwjgl-opengl:3.3.3'
 
+    implementation 'org.tinylog:tinylog-api:2.6.2'
+    runtimeOnly 'org.tinylog:tinylog-impl:2.6.2'
+
+    implementation 'org.joml:joml:1.10.5'
+
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+    // https://mvnrepository.com/artifact/org.lwjgl/lwjgl
+    implementation 'org.lwjgl:lwjgl'
+    implementation 'org.lwjgl:lwjgl-glfw'
+    implementation 'org.lwjgl:lwjgl-opengl'
+
+    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 
 }
 
@@ -40,10 +55,15 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'hhkb_animator.App'
+    mainClass = 'hhkb_animator.Main'
 }
 
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+run
+{
+    jvmArgs '-XstartOnFirstThread'
 }
